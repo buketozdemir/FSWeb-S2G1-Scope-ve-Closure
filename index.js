@@ -29,11 +29,14 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
   
   Aşağıdaki skor1 ve skor2 kodlarını inceleyiniz ve aşağıdaki soruları altına not alarak cevaplayın
   
-  1. skor1 ve skor2 arasındaki fark nedir?
-  
+  1. skor1 ve skor2 arasındaki fark nedir? 
+  ??
   2. Hangisi bir closure kullanmaktadır? Nasıl tarif edebilirsin? (yarınki derste öğreneceksin :) )
+  ??
+  Üst fonksiyonda kullanılan değeri alt fonksiyonda da kullanabiliriz.
   
   3. Hangi durumda skor1 tercih edilebilir? Hangi durumda skor2 daha mantıklıdır?
+  ??
 */
 
 // skor1 kodları
@@ -64,9 +67,11 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru(){
+  let skor = Math.floor(Math.random()*16+10); /* (25-10+1)*/
+  return skor;
 }
+
 
 
 
@@ -86,10 +91,20 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
 }
 */ 
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(callback,ceyrekSayisi){
+  let EvSahibi=0;
+  let KonukTakim=0;
+    for(let i=0;i<ceyrekSayisi ;i++){
+      EvSahibi += callback();
+      KonukTakim += callback();
+     // console.log(KonukTakim);
+    }
+    return {
+      "EvSahibi": EvSahibi,
+      "KonukTakim": KonukTakim
+    };
 }
-
+//console.log(macSonucu(takimSkoru, 4));
 
 
 
@@ -109,9 +124,11 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
-
+function periyotSkoru(callback) {
+    return {
+      "EvSahibi": callback(),
+      "KonukTakim": callback()
+    }
 }
 
 
@@ -146,11 +163,47 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(periyotSkor,callback,ceyrekSayisi) {
+  function uzatmalar(){
+    sonuc.uzatmaSayisi ++;
+    let skorDetaylari = periyotSkor(callback);
+    sonuc.evSahibiSkor += skorDetaylari['EvSahibi'];
+    sonuc.konukTakimSkor += skorDetaylari['KonukTakim'];
+    sonuc.periyotSkorlari.push(`${sonuc.uzatmaSayisi}. Uzatma: Ev Sahibi ${skorDetaylari['EvSahibi']} - Konuk Takım ${skorDetaylari['KonukTakim']}`);
+    macinSonucu();
+  }
+
+  function macinSonucu() {
+    if(sonuc.evSahibiSkor==sonuc.konukTakimSkor){
+      uzatmalar();
+    }
+    else {
+      sonuc.periyotSkorlari.push(`Maç Sonucu: Ev Sahibi ${sonuc.evSahibiSkor} - Konuk Takım ${sonuc.konukTakimSkor}`)
+    }
+  }
+  let sonuc = {
+    "periyotSkorlari" : [],
+    "uzatmaSayisi": 0,
+    "evSahibiSkor": 0,
+    "konukTakimSkor": 0
+  };
+
+  for (let i=1 ; i<=ceyrekSayisi ; i++) {
+    let skorDetaylari = periyotSkor(callback);
+    sonuc.evSahibiSkor += skorDetaylari['EvSahibi'];
+    sonuc.konukTakimSkor += skorDetaylari['KonukTakim'];
+    let periyotDetay = `${i}. Periyot: Ev Sahibi ${skorDetaylari['EvSahibi']} - Konuk Takım ${skorDetaylari['KonukTakim']}`;
+     sonuc.periyotSkorlari.push(periyotDetay);
+  }
+  sonuc.evSahibiSkor=sonuc.konukTakimSkor;
+  macinSonucu();
+  
+  
+  
+  return sonuc.periyotSkorlari;
 }
 
-
+console.log(skorTabelasi(periyotSkoru,takimSkoru,4));
 
 
 /* Aşağıdaki satırları lütfen değiştirmeyiniz*/
